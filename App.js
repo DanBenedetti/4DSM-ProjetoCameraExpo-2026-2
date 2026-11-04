@@ -20,8 +20,59 @@ export default function App() {
     const result = await ImagePicker.launchCameraAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       quality: 1,
-      allowsEditing: true, 
-    })
+      allowsEditing: true,
+    });
 
+    //verifica se o usuario não cancelou a ação
+    if (!result.canceled) {
+      const uri = result.assets[0].uri;
+      setImage(uri);
+
+      try {
+        await MediaLibrary.saveToLibraryAsync(uri);
+        Alert.alert("Sucesso", "Imagem salva na galeria!");
+      } catch (error) {
+        Alert.alert("Erro", "Erro ao salvar a imagem.");
+      }
+    }
   };
+
+  const pickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+    }
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Exemplo com Expo - Câmera</Text>
+      <Button title="Tirar Foto" onPress={takePhoto} />
+      <Button title="Galeria" onPress={pickImage} />
+      {image && <Image source={{ uri: image }} style={styles.image} />}
+    </View>
+  );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 16,
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: "bold",
+    marginBottom: 20,
+  },
+  image: {
+    width: 300,
+    height: 300,
+    marginTop: 20,
+  },
+});
